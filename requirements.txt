@@ -1,0 +1,4 @@
+opencv-python-headless>=4.5.0
+numpy>=1.19.0
+streamlit>=1.0.0
+Pillow>=9.0.0  # Para manejo de imágenes alternativo
