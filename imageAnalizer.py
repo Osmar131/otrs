@@ -3,6 +3,7 @@ from PIL import Image
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import io
 
 # Configuración de la página (wide mode y barra lateral colapsada por defecto)
 st.set_page_config(
@@ -60,7 +61,6 @@ image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # Ecualización
 image_eq = equalize_rgb(image_rgb, clip_limit)
-
 # Diseño de columnas
 col1, col2  = st.columns([1,1])
 with col1:
@@ -74,6 +74,7 @@ with col1:
 
         # Canales de color
         channels = ['Rojo', 'Verde', 'Azul']
+        cmaps = ['Reds', 'Greens', 'Blues']
         colors = ['r', 'g', 'b']
 
         for i, (color, channel) in enumerate(zip(colors, channels)):
@@ -93,48 +94,59 @@ with col1:
         st.metric("Brillo Medio", f"{np.mean(image_rgb):.1f}")
         st.progress(np.mean(image_rgb)/255)
         st.metric("Contraste (Desviación Estándar)", f"{np.std(image_rgb):.1f}")
-        
+
+image_eq = cv2.cvtColor(image_eq, cv2.COLOR_BGR2RGB)
 with col2:
     st.header("Imagen equalizada")
     st.image(image_eq)#, width=width_img)
+    # Bóton de descarga
+    _, img_encoded = cv2.imencode(".png", image_eq)
+    img_byte_arr = img_encoded.tobytes()
+
+    st.download_button(
+        label="Descargar imagen equalizada",
+        data=img_byte_arr,
+        file_name="imagen.png",
+        mime="image/png"
+        )
     if show_channels:
-        st.markdown("### 🖼️ Canales de Color")
+        img_channels_rgb = cv2.hconcat([image_rgb[:, :, 0], image_rgb[:, :, 1], image_rgb[:, :, 2]])
+        img_channels_eq = cv2.hconcat([image_eq[:, :, 0], image_eq[:, :, 1], image_eq[:, :, 2]])
+        st.markdown("### 🖼 Canales de Color")
         fig_orig = plt.figure()
         for i, (color, channel) in enumerate(zip(colors, channels), 1):
             plt.subplot(1, 3, i)
-            plt.imshow(image_rgb[:, :, i-1]) # , cmap='gray'
+            im_red = image_rgb[:, :, 0]
+            plt.imshow(image_rgb[:, :, i-1], cmap='gray') # , cmap=cmaps[i-1]
             plt.title(f'Canal {channel}')
             plt.axis('off')
         st.pyplot(fig_orig)
 
         # Ecualizado
-        st.markdown("#### Ecualizado")
+        st.markdown("#### Canales de Color Ecualizados")
         fig_eq = plt.figure()
         for i, (color, channel) in enumerate(zip(colors, channels), 1):
             plt.subplot(1, 3, i)
-            plt.imshow(image_eq[:, :, i-1]) # , cmap='gray'
+            plt.imshow(image_eq[:, :, i-1], cmap='gray') # , cmap=cmaps[i-1]
             plt.title(f'Canal {channel}')
             plt.axis('off')
         st.pyplot(fig_eq)
-##    st.header("Grafico Escala de grises")
-##    fig, (ax, ax2) = plt.subplots(1,2)
-##    ax.hist(gray_image.ravel(), bins=256, range=[0, 256], color='gray', alpha=0.7)
-##    ax.set_xlim([0, 256])
-##    ax.set_xlabel("Intensidad de píxeles")
-##    ax.set_ylabel("Frecuencia")
-##    st.pyplot(fig)
+
+        _, img_encoded = cv2.imencode(".png", img_channels_eq)
+        img_byte_arr = img_encoded.tobytes()
+
+        st.download_button(
+            label="Descargar imagen 'Canales de color ecualizados'",
+            data=img_byte_arr,
+            file_name="imagen.png",
+            mime="image/png"
+            )
 
     # Estadísticas debajo de la imagen
     with st.expander("📊 Métricas", expanded=True):
         st.metric("Brillo Medio", f"{np.mean(gray_image):.1f}")
         st.progress(np.mean(gray_image)/255)
         st.metric("Contraste (Desviación Estándar)", f"{np.std(gray_image):.1f}")
-
-    # Histograma ecualizado
-##    ax2.hist(image_eq.ravel(), 256, [0,256], color='blue', alpha=0.7)
-##    ax2.set_title('Ecualizado (CLAHE)')
-##    ax2.grid(alpha=0.2)
-
 
 
 
