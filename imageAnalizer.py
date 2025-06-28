@@ -41,14 +41,26 @@ def equalize_rgb(image, clip_limit):
 
     return rgb_eq
 
+# Imagen por defecto
+default_image_path = "Pic_0698_or06158.png"  # Cambia esto a tu imagen local
+default_image = Image.open(default_image_path)
+
 # Widget para cargar la imagen
 uploaded_file = st.file_uploader(
     "Sube una imagen", 
     type=["jpg", "jpeg", "png", "webp"],
-    help="Formatos soportados: JPG, PNG, WEBP"
-)
+    help="Formatos soportados: JPG, PNG, WEBP")
 
-image = Image.open(uploaded_file)
+# Mostrar imagen (cargada o por defecto)
+if uploaded_file is not None:
+    # Leer la imagen subida
+    image = Image.open(uploaded_file)
+    st.success("¡Imagen cargada correctamente!")
+else:
+    image = default_image
+    st.info("Usando imagen por defecto.")
+
+##image = Image.open(uploaded_file)
 image = np.array(image)
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
