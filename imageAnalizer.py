@@ -51,7 +51,6 @@ uploaded_file = st.file_uploader(
 image = Image.open(uploaded_file)
 image = np.array(image)
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-<<<<<<< HEAD
 gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
 # Sidebar con controles
@@ -59,7 +58,7 @@ with st.sidebar:
     # Selectbox
     opcion = st.selectbox(
         "Elige una categoría:",
-        ("RGB Image", "Gray Image", "Smoothing"))
+        ("RGB Image", "Gray Image", "Smoothing", "Filtered", "Edges"))
 
     if "RGB Image" == opcion:
         num_chann = 3
@@ -130,92 +129,10 @@ def deploy_histograma(image, image_eq, channels):
 
         st.download_button(
             label="Descargar imagen equalizada",
-=======
-gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-# Ecualización
-image_eq = equalize_rgb(image_rgb, clip_limit)
-# Diseño de columnas
-col1, col2  = st.columns([1,1])
-with col1:
-    st.header("Imagen original")
-    st.image(image)#, width=width_img)
-
-    if show_histograms:
-        st.markdown("### 📊 Histogramas Comparativos")
-        # Crear figura con subplots
-        fig, axes = plt.subplots(3,2)
-
-        # Canales de color
-        channels = ['Rojo', 'Verde', 'Azul']
-        cmaps = ['Reds', 'Greens', 'Blues']
-        colors = ['r', 'g', 'b']
-
-        for i, (color, channel) in enumerate(zip(colors, channels)):
-            # Histogramas original
-            axes[i, 0].hist(image_rgb[:,:, i].ravel(), 256, [0,256], color=color, alpha=0.7)
-            axes[i, 0].set_title(f'Original - Canal {channel}')
-            axes[i, 0].grid(alpha=0.3)
-            # Histogramas ecualizado
-            axes[i, 1].hist(image_eq[:, :, i].ravel(), 256, [0,256], color=color, alpha=0.7)
-            axes[i, 1].set_title(f'Ecualizado - Canal {channel}')
-            axes[i, 1].grid(alpha=0.3)
-
-        plt.tight_layout()
-        st.pyplot(fig)
-    
-    with st.expander("📊 Métricas", expanded=True):
-        st.metric("Brillo Medio", f"{np.mean(image_rgb):.1f}")
-        st.progress(np.mean(image_rgb)/255)
-        st.metric("Contraste (Desviación Estándar)", f"{np.std(image_rgb):.1f}")
-
-image_eq = cv2.cvtColor(image_eq, cv2.COLOR_BGR2RGB)
-with col2:
-    st.header("Imagen equalizada")
-    st.image(image_eq)#, width=width_img)
-    # Bóton de descarga
-    _, img_encoded = cv2.imencode(".png", image_eq)
-    img_byte_arr = img_encoded.tobytes()
-
-    st.download_button(
-        label="Descargar imagen equalizada",
-        data=img_byte_arr,
-        file_name="imagen.png",
-        mime="image/png"
-        )
-    if show_channels:
-        img_channels_rgb = cv2.hconcat([image_rgb[:, :, 0], image_rgb[:, :, 1], image_rgb[:, :, 2]])
-        img_channels_eq = cv2.hconcat([image_eq[:, :, 0], image_eq[:, :, 1], image_eq[:, :, 2]])
-        st.markdown("### 🖼 Canales de Color")
-        fig_orig = plt.figure()
-        for i, (color, channel) in enumerate(zip(colors, channels), 1):
-            plt.subplot(1, 3, i)
-            im_red = image_rgb[:, :, 0]
-            plt.imshow(image_rgb[:, :, i-1], cmap='gray') # , cmap=cmaps[i-1]
-            plt.title(f'Canal {channel}')
-            plt.axis('off')
-        st.pyplot(fig_orig)
-
-        # Ecualizado
-        st.markdown("#### Canales de Color Ecualizados")
-        fig_eq = plt.figure()
-        for i, (color, channel) in enumerate(zip(colors, channels), 1):
-            plt.subplot(1, 3, i)
-            plt.imshow(image_eq[:, :, i-1], cmap='gray') # , cmap=cmaps[i-1]
-            plt.title(f'Canal {channel}')
-            plt.axis('off')
-        st.pyplot(fig_eq)
-
-        _, img_encoded = cv2.imencode(".png", img_channels_eq)
-        img_byte_arr = img_encoded.tobytes()
-
-        st.download_button(
-            label="Descargar imagen 'Canales de color ecualizados'",
->>>>>>> 962ba0b4cf44f51a28112650ad65a1d15fccffc1
             data=img_byte_arr,
             file_name="imagen.png",
             mime="image/png"
             )
-<<<<<<< HEAD
         if show_channels:
             img_channels_rgb = cv2.hconcat([image_rgb[:, :, 0], image_rgb[:, :, 1], image_rgb[:, :, 2]])
             img_channels_eq = cv2.hconcat([image_eq[:, :, 0], image_eq[:, :, 1], image_eq[:, :, 2]])
@@ -254,16 +171,6 @@ with col2:
             st.metric("Brillo Medio", f"{np.mean(gray_image):.1f}")
             st.progress(np.mean(gray_image)/255)
             st.metric("Contraste (Desviación Estándar)", f"{np.std(gray_image):.1f}")
-=======
-
-    # Estadísticas debajo de la imagen
-    with st.expander("📊 Métricas", expanded=True):
-        st.metric("Brillo Medio", f"{np.mean(gray_image):.1f}")
-        st.progress(np.mean(gray_image)/255)
-        st.metric("Contraste (Desviación Estándar)", f"{np.std(gray_image):.1f}")
-
-
->>>>>>> 962ba0b4cf44f51a28112650ad65a1d15fccffc1
 
 # Diseño de columnas
 if 'RGB Image' == opcion:
