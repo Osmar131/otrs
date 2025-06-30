@@ -191,4 +191,6 @@ elif 'Gray Image' == opcion:
     deploy_histograma(image, image_eq, num_chann)
 elif 'Smoothing' == opcion:
     st.header("Working on it...")
+elif 'Other' == opcion:
+    st.header("Working on it...")
 
