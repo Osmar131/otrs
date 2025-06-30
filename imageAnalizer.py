@@ -148,7 +148,7 @@ def deploy_histograma(image, image_eq, channels):
         if show_channels:
             img_channels_rgb = cv2.hconcat([image_rgb[:, :, 0], image_rgb[:, :, 1], image_rgb[:, :, 2]])
             img_channels_eq = cv2.hconcat([image_eq[:, :, 0], image_eq[:, :, 1], image_eq[:, :, 2]])
-            st.markdown("### 🖼 🔴🟢🔵 RGB Channel Analysis")
+            st.markdown("### 🔴🟢🔵 RGB Channel Analysis")
             fig_orig = plt.figure()
             for i, (color, channel) in enumerate(zip(colors, channels), 1):
                 plt.subplot(1, 3, i)
@@ -159,7 +159,7 @@ def deploy_histograma(image, image_eq, channels):
             st.pyplot(fig_orig)
 
             # Ecualizado
-            st.markdown("#### 🌈 Equalized Channel Visualization")
+            st.markdown("#### Equalized Channel Visualization")
             fig_eq = plt.figure()
             for i, (color, channel) in enumerate(zip(colors, channels), 1):
                 plt.subplot(1, 3, i)
