@@ -70,7 +70,7 @@ with st.sidebar:
     # Selectbox
     opcion = st.selectbox(
         "Select a category",
-        ("RGB Image", "Gray Image", "Smoothing", "Filtered", "Edges"))
+        ("RGB Image", "Gray Image", "Smoothing", "Filtered", "Edges", "Others"))
 
     if "RGB Image" == opcion:
         num_chann = 3
@@ -189,6 +189,8 @@ if 'RGB Image' == opcion:
     deploy_histograma(image, image_eq, num_chann)
 elif 'Gray Image' == opcion:
     deploy_histograma(image, image_eq, num_chann)
+elif 'Filtered' == opcion:
+    st.header("Working on it...")
 elif 'Smoothing' == opcion:
     st.header("Working on it...")
 elif 'Other' == opcion:
