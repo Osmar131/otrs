@@ -72,9 +72,9 @@ if __name__ == "__main__":
         # Selectbox
         opcion = st.selectbox(
             "Select a category",
-            ("RGB Image", "Gray Image", "Smoothing", "Filtered", "Edges", "Others"))
+            ("RGB Image equalization", "Gray Image equalization", "Smoothing", "Filtered", "Edges", "Others"))
 
-        if "RGB Image" == opcion:
+        if "RGB Image equalization" == opcion:
             num_chann = 3
             st.header("⚙️ ⚖️ Image Equalization Settings")
             clip_limit = st.slider("Contrast Limit (CLAHE)", 1.0, 5.0, 2.0, 0.1)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
             image_eq = equalize_rgb(image_rgb, clip_limit)
             image_eq = cv2.cvtColor(image_eq, cv2.COLOR_BGR2RGB)
             gray_image_eq = image_eq
-        elif "Gray Image" == opcion:
+        elif "Gray Image equalization" == opcion:
             num_chann = 1
             st.header("⚙️️ ⚖️ Image Equalization Settings")
             clip_limit = st.slider("Contrast Limit (CLAHE)", 1.0, 5.0, 2.0, 0.1)
@@ -99,15 +99,15 @@ if __name__ == "__main__":
             # Selector de tamaño de kernel (solo valores impares)
             st.header("⚙️️ ⚖️ Depending on size of image, it could take time to process images")
             kernel_size = st.selectbox(
-                "Tamaño del Kernel (Solo impares)",
+                "Kernel Size (Odd numbers only)",
                 options=[3, 5, 7, 9, 11],
                 index=0,
-                help="El tamaño debe ser impar para tener un centro definido"
+                help="Only odd numbers work for this filter"
             )
             
             # Control deslizante para el multiplicador
             neighbor_multiplier = st.slider(
-                "Neighor multiplier",
+                "Neighbor multiplier",
                 min_value=0.0,
                 max_value=2.0,
                 value=0.5,
@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     # Diseño de columnas
     col1, col2  = st.columns([1,1])
-    if 'RGB Image' == opcion:
+    if 'RGB Image equalization' == opcion:
     ##    deploy_histograma(image, image_eq, num_chann)
         col1, col2  = st.columns([1,1])
         with col1:
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         with col2:
             value = hists.deploy_hist_col2(image, image_rgb, gray_image_eq, image_eq, num_chann, show_channels)
 
-    elif 'Gray Image' == opcion:
+    elif 'Gray Image equalization' == opcion:
     ##    deploy_histograma(image, image_eq, num_chann)
         with col1:
             value1 = hists.deploy_hist_col1(image, image_rgb, image_eq, num_chann, show_histograms)
