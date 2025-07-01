@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import io
 import hists
+import convol_function
 
 # Función para ecualización en cada canal
 def equalize_rgb(image, clip_limit):
@@ -22,105 +23,14 @@ def equalize_rgb(image, clip_limit):
 
     return rgb_eq
 
-##def deploy_hist_col1(image, image_eq, channels):
-##    st.header("🆚 Original Image (Before Processing)")
-##    st.image(image)#, width=width_img)
-##
-##    if show_histograms:
-##        st.markdown("### 📊 Comparative Histograms")
-##        # Crear figura con subplots
-##        fig, axes = plt.subplots(3,2)
-##
-##        # Canales de color
-##        channels = ['Red', 'Green', 'Blue']
-##        cmaps = ['Reds', 'Greens', 'Blues']
-##        colors = ['r', 'g', 'b']
-##
-##        for i, (color, channel) in enumerate(zip(colors, channels)):
-##            # Histogramas original
-##            axes[i, 0].hist(image_rgb[:,:, i].ravel(), 256, [0,256], color=color, alpha=0.7)
-##            axes[i, 0].set_title(f'Original - Channel {channel}')
-##            axes[i, 0].grid(alpha=0.3)
-##            # Histogramas ecualizado
-##            axes[i, 1].hist(image_eq[:, :, i].ravel(), 256, [0,256], color=color, alpha=0.7)
-##            axes[i, 1].set_title(f'Equalized - Channel {channel}')
-##            axes[i, 1].grid(alpha=0.3)
-##
-##        plt.tight_layout()
-##        st.pyplot(fig)
-##    
-##    with st.expander("📊 Metrics", expanded=True):
-##        st.metric("🔆 Mean Brightness Level", f"{np.mean(image_rgb):.1f}")
-##        st.progress(np.mean(image_rgb)/255)
-##        st.metric("⚖️ Contrast (σ)", f"{np.std(image_rgb):.1f}")
-##        
-##def deploy_hist_col2(image, image_eq, channels):
-##    st.header("🔄 Equalized Output")
-##    st.image(gray_image_eq)#, width=width_img)
-##    # Bóton de descarga
-##    _, img_encoded = cv2.imencode(".png", image_eq)
-##    img_byte_arr = img_encoded.tobytes()
-##
-##    st.download_button(
-##        label="⬇️ Save Equalized Image",
-##        data=img_byte_arr,
-##        file_name="image.png",
-##        mime="image/png"
-##        )
-##    # Canales de color
-##    channels = ['Red', 'Green', 'Blue']
-##    cmaps = ['Reds', 'Greens', 'Blues']
-##    colors = ['r', 'g', 'b']
-##        
-##    if show_channels:
-##        img_channels_rgb = cv2.hconcat([image_rgb[:, :, 0], image_rgb[:, :, 1], image_rgb[:, :, 2]])
-##        img_channels_eq = cv2.hconcat([image_eq[:, :, 0], image_eq[:, :, 1], image_eq[:, :, 2]])
-##        st.markdown("### 🔴🟢🔵 RGB Channel Analysis")
-##        fig_orig = plt.figure()
-##        for i, (color, channel) in enumerate(zip(colors, channels), 1):
-##            plt.subplot(1, 3, i)
-##            im_red = image_rgb[:, :, 0]
-##            plt.imshow(image_rgb[:, :, i-1], cmap='gray') # , cmap=cmaps[i-1]
-##            plt.title(f'Channel {channel}')
-##            plt.axis('off')
-##        st.pyplot(fig_orig)
-##
-##        # Ecualizado
-##        st.markdown("#### Equalized Channel Visualization")
-##        fig_eq = plt.figure()
-##        for i, (color, channel) in enumerate(zip(colors, channels), 1):
-##            plt.subplot(1, 3, i)
-##            plt.imshow(image_eq[:, :, i-1], cmap='gray') # , cmap=cmaps[i-1]
-##            plt.title(f'Channel {channel}')
-##            plt.axis('off')
-##        st.pyplot(fig_eq)
-##
-##        _, img_encoded = cv2.imencode(".png", img_channels_eq)
-##        img_byte_arr = img_encoded.tobytes()
-##
-##        st.download_button(
-##            label="⬇️ Save Equalized RGB Channels",
-##            data=img_byte_arr,
-##            file_name="image.png",
-##            mime="image/png"
-##            )
-##
-##    # Estadísticas debajo de la imagen
-##    with st.expander("📊 Metrics", expanded=True):
-##        st.metric("🔆 Mean Brightness Level", f"{np.mean(gray_image):.1f}")
-##        st.progress(np.mean(gray_image)/255)
-##        st.metric("⚖️ Contrast (σ)", f"{np.std(gray_image):.1f}")
-
 ## Este código solo se ejecuta si el archivo se corre directamente
 if __name__ == "__main__":
 
     # Configuración de la página (wide mode y barra lateral colapsada por defecto)
-    st.set_page_config(
-        page_title="Pixel-Level Image Analysis",
-        page_icon="📊",
-        layout="wide",
-        initial_sidebar_state="collapsed"
-    )
+    st.set_page_config(page_title="Pixel-Level Image Analysis",
+                       page_icon="📊",
+                       layout="wide",
+                       initial_sidebar_state="collapsed")
 
     # Título principal con estilo
     st.markdown("""
@@ -139,10 +49,9 @@ if __name__ == "__main__":
     default_image = Image.open(default_image_path)
 
     # Widget para cargar la imagen
-    uploaded_file = st.file_uploader(
-        "Upload your image", 
-        type=["jpg", "jpeg", "png", "webp"],
-        help="Supported formats: JPG, PNG, WEBP")
+    uploaded_file = st.file_uploader("Upload your image",
+                                     type=["jpg", "jpeg", "png", "webp"],
+                                     help="Supported formats: JPG, PNG, WEBP")
 
     # Mostrar imagen (cargada o por defecto)
     if uploaded_file is not None:
@@ -179,15 +88,36 @@ if __name__ == "__main__":
             num_chann = 1
             st.header("⚙️️ ⚖️ Image Equalization Settings")
             clip_limit = st.slider("Contrast Limit (CLAHE)", 1.0, 5.0, 2.0, 0.1)
-            show_histograms = st.checkbox("📊 Display histograms", True)
+            show_histograms = st.checkbox("📊 Display histograms", False)
             show_channels = st.checkbox("🌈 Show individual color channels", False)
             # Ecualización
             image_eq = equalize_rgb(image_rgb, clip_limit)
             image_eq = cv2.cvtColor(image_eq, cv2.COLOR_BGR2RGB)
             gray_image_eq = cv2.cvtColor(image_eq, cv2.COLOR_RGB2GRAY)
             image = gray_image
+        if "Filtered":
+            # Selector de tamaño de kernel (solo valores impares)
+            st.header("⚙️️ ⚖️ Depending on size of image, it could take time to process images")
+            kernel_size = st.selectbox(
+                "Tamaño del Kernel (Solo impares)",
+                options=[3, 5, 7, 9, 11],
+                index=0,
+                help="El tamaño debe ser impar para tener un centro definido"
+            )
+            
+            # Control deslizante para el multiplicador
+            neighbor_multiplier = st.slider(
+                "Neighor multiplier",
+                min_value=0.0,
+                max_value=2.0,
+                value=0.5,
+                step=0.1,
+                help="Controls how much neighboring pixels affect the result"
+            )
+            gray_convolution = st.checkbox("Convolution gray image", False)
 
     # Diseño de columnas
+    col1, col2  = st.columns([1,1])
     if 'RGB Image' == opcion:
     ##    deploy_histograma(image, image_eq, num_chann)
         col1, col2  = st.columns([1,1])
@@ -195,16 +125,26 @@ if __name__ == "__main__":
             value = hists.deploy_hist_col1(image, image_rgb, image_eq, num_chann, show_histograms)
         with col2:
             value = hists.deploy_hist_col2(image, image_rgb, gray_image_eq, image_eq, num_chann, show_channels)
-            
+
     elif 'Gray Image' == opcion:
     ##    deploy_histograma(image, image_eq, num_chann)
-        col1, col2  = st.columns([1,1])
         with col1:
-            value = hists.deploy_hist_col1(image, image_rgb, image_eq, num_chann, show_histograms)
+            value1 = hists.deploy_hist_col1(image, image_rgb, image_eq, num_chann, show_histograms)
         with col2:
-            value = hists.deploy_hist_col2(image, image_rgb, gray_image_eq,  image_eq, num_chann, show_channels)
+            value2 = hists.deploy_hist_col2(image, image_rgb, gray_image_eq,  image_eq, num_chann, show_channels)
             
     elif 'Filtered' == opcion:
+        if gray_convolution:
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        with col1:
+            st.header("Original Image (Before Processing)")
+            st.image(image)
+        with col2:
+            img = np.array(image)
+            value2 = convol_function.adjustable_convolution(img,
+                                neighborhood_size = kernel_size,
+                                neighbor_multiplier = neighbor_multiplier,
+                                padding = 'same')
         st.header("Working on it...")
     elif 'Smoothing' == opcion:
         st.header("Working on it...")
