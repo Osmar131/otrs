@@ -49,15 +49,23 @@ if __name__ == "__main__":
     default_image = Image.open(default_image_path)
 
     # Widget para cargar la imagen
-    uploaded_file = st.file_uploader("Upload your image",
+    MAX_FILE_SIZE = 20 * 1024 * 1024 # 20 MB
+    uploaded_file = st.file_uploader("Upload your image (max 20MB)",
                                      type=["jpg", "jpeg", "png", "webp"],
-                                     help="Supported formats: JPG, PNG, WEBP")
+                                     help="Supported formats: JPG, PNG, WEBP. Max size: 20MB")
 
     # Mostrar imagen (cargada o por defecto)
     if uploaded_file is not None:
         # Leer la imagen subida
-        image = Image.open(uploaded_file)
-        st.success("Image uploaded successfully!")
+        if uploaded_file.size > MAX_FILE_SIZE:
+            st.error("🚨 File size exceeds 20MB limit!")
+            st.stop() # Halt execution
+        else:
+            st.success(f"File size: {uploaded_file.size / (1024*1024):.2f} MB (Accepted)")
+##            st.image(uploaded_file)
+            image = Image.open(uploaded_file)
+##        image = Image.open(uploaded_file)
+##        st.success("Image uploaded successfully!")
     else:
         image = default_image
         st.info("🖼️ Using default sample image")
