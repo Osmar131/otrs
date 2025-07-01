@@ -156,6 +156,8 @@ if __name__ == "__main__":
         st.header("Working on it...")
     elif 'Smoothing' == opcion:
         st.header("Working on it...")
+    elif "Edges" == opcion:
+        st.header("Working on it...")
     elif 'Other' == opcion:
         st.header("Working on it...")
 
