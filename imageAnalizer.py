@@ -84,7 +84,7 @@ if __name__ == "__main__":
             image_eq = equalize_rgb(image_rgb, clip_limit)
             image_eq = cv2.cvtColor(image_eq, cv2.COLOR_BGR2RGB)
             gray_image_eq = image_eq
-        if "Gray Image" == opcion:
+        elif "Gray Image" == opcion:
             num_chann = 1
             st.header("⚙️️ ⚖️ Image Equalization Settings")
             clip_limit = st.slider("Contrast Limit (CLAHE)", 1.0, 5.0, 2.0, 0.1)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
             image_eq = cv2.cvtColor(image_eq, cv2.COLOR_BGR2RGB)
             gray_image_eq = cv2.cvtColor(image_eq, cv2.COLOR_RGB2GRAY)
             image = gray_image
-        if "Filtered":
+        elif "Filtered":
             # Selector de tamaño de kernel (solo valores impares)
             st.header("⚙️️ ⚖️ Depending on size of image, it could take time to process images")
             kernel_size = st.selectbox(
